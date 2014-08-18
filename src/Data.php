@@ -1,4 +1,4 @@
-<?php namespace Securiscan\Meta;
+<?php namespace Enginebit\Meta;
 
 use Illuminate\Database\Eloquent\Model;
 

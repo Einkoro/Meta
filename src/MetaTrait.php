@@ -1,4 +1,4 @@
-<?php namespace Securiscan\Meta;
+<?php namespace Enginebit\Meta;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
