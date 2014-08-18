@@ -1,5 +1,6 @@
 <?php namespace Enginebit\Meta;
 
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 class Data extends Model {
@@ -55,10 +56,15 @@ class Data extends Model {
 			$this->type = "array";
 			$this->attributes['value'] = json_encode($value);
 		}
+		elseif ($value instanceof DateTime)
+		{
+			$this->type = "datetime";
+			$this->attributes['value'] = $this->fromDateTime($value);
+		}
 		elseif ($value instanceof Model)
 		{
 			$this->type = "model";
-			$this->attributes['value'] = get_class($value) . ! $value->exists ? : '#' . $value->getKey();
+			$this->attributes['value'] = get_class($value) . (! $value->exists ? '' : '#' . $value->getKey());
 		}
 		elseif (is_object($value))
 		{
@@ -81,11 +87,16 @@ class Data extends Model {
 			case 'array':
 				return json_decode($value, true);
 			case 'object':
-				return json_decode($value, true);
+				return json_decode($value);
 			case 'datetime':
 				return $this->asDateTime($value);
 			case 'model':
 			{
+				if (strpos($value, '#') === false)
+				{
+					return new $value;
+				}
+
 				list($class, $id) = explode('#', $value);
 
 				return with(new $class)->findOrFail($id);
