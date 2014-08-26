@@ -1,6 +1,6 @@
 {
     "name": "enginebit/meta",
-    "description": "The meta trait gives a model the ability to dynamically set and get data on a model.",
+    "description": "Meta data for Laravel's Eloquent model",
 	"license": "MIT",
     "authors": [
         {

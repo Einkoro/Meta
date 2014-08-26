@@ -34,8 +34,10 @@ class CreateUserDataTable extends Migration {
 			$table->integer('user_id')->unsigned()->index();
 			$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
+			$table->string('type')->default('null');
+
 			$table->string('key')->index();
-			$table->text('value');
+			$table->text('value'); // or $table->string('value')->index();
 
 			$table->timestamps();
 		});
@@ -108,7 +110,7 @@ echo $user->first_name; // This wil first check the model and if null is returne
 
 $user = User::find(1);
 
-$user->set('activated_at',Carbon::now());
+$user->setMeta('activated_at',Carbon::now());
 
 $user->save();
 
