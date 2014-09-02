@@ -38,8 +38,6 @@ trait MetaTrait {
 	{
 		if (! $this->metaLoaded)
 		{
-
-
 			if ($this->exists)
 			{
 				$objects = $this->newMetaModel()->where($this->getMetaKeyName(),$this->getKey())->get();
@@ -232,21 +230,44 @@ trait MetaTrait {
 	}
 
 	/**
-	 * Dynamically retrieve attributes on the model.
+	 * Get an attribute from the model.
 	 *
 	 * @param  string  $key
 	 * @return mixed
 	 */
-	public function __get($key)
+	public function getAttribute($key)
 	{
-		$value = $this->getAttribute($key);
+		$inAttributes = array_key_exists($key, $this->attributes);
 
-		if(is_null($value))
+		// If the key references an attribute, we can just go ahead and return the
+		// plain attribute value from the model. This allows every attribute to
+		// be dynamically accessed through the _get method without accessors.
+		if ($inAttributes || $this->hasGetMutator($key))
 		{
-			$value = $this->getMeta($key);
+			return $this->getAttributeValue($key);
 		}
 
-		return $value;
+		// If the key already exists in the relationships array, it just means the
+		// relationship has already been loaded, so we'll just return it out of
+		// here because there is no need to query within the relations twice.
+		if (array_key_exists($key, $this->relations))
+		{
+			return $this->relations[$key];
+		}
+
+		// If the "attribute" exists as a method on the model, we will just assume
+		// it is a relationship and will load and return results from the query
+		// and hydrate the relationship's value on the "relationships" array.
+		$camelKey = camel_case($key);
+
+		if (method_exists($this, $camelKey))
+		{
+			return $this->getRelationshipFromMethod($key, $camelKey);
+		}
+
+		// If we get here then there was nothing on the model
+		// Lets try and retrieve the data from the relationship
+		return $this->getMeta($key);
 	}
 
 	/**
