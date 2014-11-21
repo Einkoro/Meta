@@ -91,7 +91,16 @@ trait MetaTrait {
 
 		$meta = $this->metaData->get($key, null);
 
-		return (is_null($meta) or $meta->isDeleted()) ? null : ($raw) ? $meta : $meta->value ;
+		if (is_null($meta) or $meta->isDeleted())
+		{
+			$return = null;
+		}
+		else
+		{
+			$return = ($raw) ? $meta : $meta->value;
+		}
+
+		return $return;
 	}
 
 	/**
